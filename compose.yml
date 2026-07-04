@@ -10,18 +10,24 @@ services:
       - KC_DB_URL_PORT=5432
       - KC_DB_USERNAME=${KEYCLOAK_DB_USERNAME}
       - KC_DB_PASSWORD=${KEYCLOAK_DB_PASSWORD}
-      - KC_HOSTNAME=${DOMAIN_NAME}
+      - KC_HOSTNAME=https://${DOMAIN_NAME}:443/
+      - KC_PROXY_HEADERS=xforwarded
+      - KC_HOSTNAME_STRICT=false
+      - KC_PROXY=edge
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN_NAME}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
-      #- KC_HTTPS_CERTIFICATE_FILE=/opt/certs/${DOMAIN_NAME}.crt
-      #- KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/certs/${DOMAIN_NAME}.key
+      - KC_HTTPS_CERTIFICATE_FILE=/opt/certs/${DOMAIN_NAME}.crt
+      - KC_HTTPS_CERTIFICATE_KEY_FILE=/opt/certs/${DOMAIN_NAME}.key
     command:
-      start
+      start-dev
     restart: always
     ports:
       - 8443:8443
+      - 8080:8080
     volumes:
       - keycloak-volume:/opt/keycloak/data
+      - ./certs/${DOMAIN_NAME}.crt:/opt/certs/${DOMAIN_NAME}.crt
+      - ./certs/${DOMAIN_NAME}.key:/opt/certs/${DOMAIN_NAME}.key
     tty: true
     user: root
     depends_on:
